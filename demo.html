@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIH Team 7 ParentGPT - Your Friendly Parenting Assistant</title>
+    <link rel="stylesheet" href="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/themes/df-messenger-default.css">
+    <script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #8e44ad;
+            --secondary-color: #f1c40f;
+            --background-color: #f9f7ff;
+            --accent-color: #3498db;
+        }
+        
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            color: white;
+            width: 100%;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+        
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            margin-top: 10px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 40px;
+        }
+        
+        .feature {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            width: 220px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .feature:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        
+        .feature h3 {
+            margin: 0 0 10px 0;
+            color: var(--primary-color);
+        }
+        
+        .feature p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #555;
+        }
+        
+        .decoration {
+            position: absolute;
+            z-index: -1;
+            opacity: 0.4;
+        }
+        
+        .circle1 {
+            background-color: var(--secondary-color);
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            top: -100px;
+            right: -100px;
+        }
+        
+        .circle2 {
+            background-color: var(--primary-color);
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            bottom: 100px;
+            left: -50px;
+        }
+        
+        .flow-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 40px 0;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .step {
+            background: white;
+            border-radius: 10px;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+        
+        .step:hover {
+            transform: translateX(5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+        }
+        
+        .step-number {
+            background: var(--primary-color);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .step-content h3 {
+            margin: 0 0 5px 0;
+            color: var(--primary-color);
+        }
+        
+        .step-content p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #555;
+        }
+        
+        .cta-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .cta-button:hover {
+            background: var(--accent-color);
+            transform: scale(1.05);
+        }
+        
+        footer {
+            background: var(--primary-color);
+            color: white;
+            width: 100%;
+            padding: 15px 0;
+            text-align: center;
+            margin-top: auto;
+        }
+        
+        /* Chatbot styling */
+        df-messenger {
+            z-index: 999;
+            position: fixed;
+            --df-messenger-font-color: #333;
+            --df-messenger-font-family: 'Nunito', sans-serif;
+            --df-messenger-chat-background: #f7f4ff;
+            --df-messenger-message-user-background: #e9d8f4;
+            --df-messenger-message-bot-background: #fff;
+            --df-messenger-button-color: var(--primary-color);
+            --df-messenger-button-text-color: white;
+            --df-messenger-chat-border-radius: 20px;
+            --df-messenger-message-border-radius: 18px;
+            bottom: 20px;
+            right: 20px;
+        }
+        
+        /* Custom chatbot bubble animation */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        df-messenger-chat-bubble {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .features {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .feature {
+                width: 80%;
+            }
+            
+            .step {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .step-number {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Decorative elements -->
+    <div class="decoration circle1"></div>
+    <div class="decoration circle2"></div>
+    
+    <header>
+        <h1><span class="logo">AIH Team 7</span> ParentGPT</h1>
+        <div class="subtitle">Your intelligent parenting assistant</div>
+    </header>
+    
+    <div class="content">
+        <h2>Smart Parenting Made Simple</h2>
+        <p>Let our AI help you understand your child better and become the best parent you can be.</p>
+        
+        <div class="flow-steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Questionnaire</h3>
+                    <p>Complete our questionnaire to help us understand your child's screen time and habits</p>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>Personalized Advice</h3>
+                    <p>Get customized parenting tips based on your child's unique needs and behaviors</p>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Learn & Grow</h3>
+                    <p>Access new articles and the latest information on effective parenting techniques</p>
+                </div>
+            </div>
+        </div>
+        
+        <button class="cta-button" onclick="document.querySelector('df-messenger-chat-bubble').click()">
+            Start Your Parenting Journey
+        </button>
+        
+        <div class="features">
+            <div class="feature" onclick="document.querySelector('df-messenger-chat-bubble').click()">
+                <div class="feature-icon">📋</div>
+                <h3>Questionnaire</h3>
+                <p>Understand your child's screen time habits and behaviors</p>
+            </div>
+            
+            <div class="feature" onclick="document.querySelector('df-messenger-chat-bubble').click()">
+                <div class="feature-icon">💡</div>
+                <h3>Parenting Tips</h3>
+                <p>Get practical advice tailored to your family's specific needs</p>
+            </div>
+            
+            <div class="feature" onclick="document.querySelector('df-messenger-chat-bubble').click()">
+                <div class="feature-icon">📚</div>
+                <h3>Articles & Learning</h3>
+                <p>Discover the latest research and information on child development</p>
+            </div>
+        </div>
+        
+        <p style="margin-top: 40px; font-style: italic;">Click any feature or the chat bubble to get started!</p>
+    </div>
+    
+    <footer>
+        &copy; 2025 AIH Team 7 ParentGPT - Empowering parents with knowledge and support
+    </footer>
+    
+    <!-- Your Dialogflow chatbot integration -->
+    <df-messenger
+      location="asia-southeast1"
+      project-id="aih-parent101-srtk"
+      agent-id="54ceca31-1911-4393-ae3f-d931fb72f04f"
+      language-code="en"
+      max-query-length="-1">
+      <df-messenger-chat-bubble
+        chat-title="AIH Team 7 ParentGPT">
+      </df-messenger-chat-bubble>
+    </df-messenger>
+</body>
+</html>
