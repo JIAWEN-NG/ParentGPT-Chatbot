@@ -13,6 +13,7 @@
             --secondary-color: #f1c40f;
             --background-color: #f9f7ff;
             --accent-color: #3498db;
+            --chatbot-color: #3498db; /* Blue color for chatbot */
         }
         
         body {
@@ -210,7 +211,7 @@
             --df-messenger-chat-background: #f7f4ff;
             --df-messenger-message-user-background: #e9d8f4;
             --df-messenger-message-bot-background: #fff;
-            --df-messenger-button-color: var(--primary-color);
+            --df-messenger-button-color: var(--chatbot-color); /* Using blue color for button */
             --df-messenger-button-text-color: white;
             --df-messenger-chat-border-radius: 20px;
             --df-messenger-message-border-radius: 18px;
@@ -218,15 +219,20 @@
             right: 20px;
         }
         
-        /* Custom chatbot bubble animation */
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
+        /* Custom styles for chatbot icon color */
         df-messenger-chat-bubble {
             animation: pulse 2s infinite;
+            background-color: var(--chatbot-color) !important; /* Blue chat bubble */
+        }
+        
+        /* Additional custom style to make sure the icon itself is white for contrast */
+        df-messenger-chat-bubble::part(icon) {
+            color: white !important;
+        }
+        
+        /* Additional style to make the header of the chat blue as well */
+        df-messenger::part(header) {
+            background-color: var(--chatbot-color) !important;
         }
         
         /* Mobile responsive */
@@ -253,6 +259,32 @@
                 margin-right: 0;
                 margin-bottom: 10px;
             }
+        }
+    </style>
+    
+    <!-- Custom styling to fix Dialogflow chat issues -->
+    <style>
+        /* This fixes strikethrough in numbered lists within the chatbot messages */
+        df-messenger::part(message) {
+            text-decoration: none !important;
+        }
+        
+        /* Ensure all text within messages has no text-decoration */
+        df-messenger::part(bot-message),
+        df-messenger::part(user-message),
+        df-messenger::part(bot-message) *,
+        df-messenger::part(user-message) * {
+            text-decoration: none !important;
+        }
+        
+        /* Important override to force no text-decoration on all elements */
+        df-messenger ol,
+        df-messenger ul,
+        df-messenger li,
+        df-messenger p,
+        df-messenger span,
+        df-messenger div {
+            text-decoration: none !important;
         }
     </style>
 </head>
@@ -338,5 +370,85 @@
         chat-title="AIH Team 7 ParentGPT">
       </df-messenger-chat-bubble>
     </df-messenger>
+
+    <!-- Script to remove strikethrough formatting in Dialogflow messages -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to apply custom styling to the shadow DOM
+            function applyStylingToShadowDOM() {
+                const dfMessenger = document.querySelector('df-messenger');
+                
+                if (dfMessenger && dfMessenger.shadowRoot) {
+                    // Create a style element
+                    const style = document.createElement('style');
+                    
+                    // Add rules to remove any strikethrough styling
+                    style.textContent = `
+                        * {
+                            text-decoration: none !important;
+                        }
+                        
+                        ol li, ul li {
+                            text-decoration: none !important;
+                            display: list-item !important;
+                        }
+                        
+                        a {
+                            text-decoration: underline !important;
+                        }
+                    `;
+                    
+                    // Append style to the shadow root
+                    dfMessenger.shadowRoot.appendChild(style);
+                    
+                    // Also try to find and modify the message list if available
+                    const messageList = dfMessenger.shadowRoot.querySelector('df-message-list');
+                    if (messageList && messageList.shadowRoot) {
+                        const messageListStyle = document.createElement('style');
+                        messageListStyle.textContent = `
+                            * {
+                                text-decoration: none !important;
+                            }
+                            
+                            ol, ul {
+                                padding-left: 20px !important;
+                            }
+                            
+                            ol li, ul li {
+                                text-decoration: none !important;
+                                display: list-item !important;
+                            }
+                        `;
+                        messageList.shadowRoot.appendChild(messageListStyle);
+                    }
+                }
+            }
+            
+            // Try to apply styling initially
+            setTimeout(applyStylingToShadowDOM, 1000);
+            
+            // Also set up a mutation observer to watch for when the chat opens
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.addedNodes.length > 0) {
+                        // Re-apply styling when DOM changes
+                        setTimeout(applyStylingToShadowDOM, 500);
+                    }
+                });
+            });
+            
+            // Start observing for changes
+            observer.observe(document.body, { childList: true, subtree: true });
+            
+            // Also try to apply styling when messages change
+            window.addEventListener('df-messenger-message-sent', function() {
+                setTimeout(applyStylingToShadowDOM, 500);
+            });
+            
+            window.addEventListener('df-messenger-message-received', function() {
+                setTimeout(applyStylingToShadowDOM, 500);
+            });
+        });
+    </script>
 </body>
 </html>
